@@ -54,7 +54,7 @@ ObjectDistance = data.data(:,8);
 data = importdata('opendlv.logic.action.AimPoint-221.csv');
 t_aim =  (data.data(:,5) + data.data(:,6)*1e-6);
 AimPointAngle = data.data(:,7);
-AimPointDistance = data.data(:,8);
+AimPointDistance = data.data(:,9);
 
 
 %% Animation 
@@ -100,7 +100,7 @@ for i = t0:tend
             set(h,'MarkerFaceColor',[0.5, 0.5, 0.5])
     end
     
-    plot(AimPointDistanceInterp*[0 cos(AimPointAngleInterp(i)+pi/2)],AimPointDistanceInterp*[0 sin(AimPointAngleInterp(i)+pi/2)],'k-o')
+    plot(AimPointDistanceInterp(i)*[0 cos(AimPointAngleInterp(i)+pi/2)],AimPointDistanceInterp(i)*[0 sin(AimPointAngleInterp(i)+pi/2)],'k-o')
 
 end
 
