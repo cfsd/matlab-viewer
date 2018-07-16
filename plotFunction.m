@@ -30,8 +30,9 @@ else
         YLim = ylim;
         text(XLim(2)*0.2,0.9*YLim(2),timeStamp,'FontSize',12)
         for k = 0:NumbOfPatches
-            patch(-localPath(surfIdx+k,5:8),localPath(surfIdx+k,1:4),'r')
+            patch(-localPath(surfIdx+k,5:8),localPath(surfIdx+k,1:4),'r','FaceAlpha',0.7)
         end
+        patch([X1,X2,X3,X4],[Y1,Y2,Y3,Y4],'k','FaceAlpha',0)
         plot(AimPointDistanceInterp(i)*[0 cos(AimPointAngleInterp(i)+pi/2)],AimPointDistanceInterp(i)*[0 sin(AimPointAngleInterp(i)+pi/2)],'k--o')
     end
     
