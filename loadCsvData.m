@@ -1,4 +1,3 @@
-close all
 %%
 % Blue cones are drawn as [0 0 1] ('b')
 % Yellow cones are drawn as [1 1 0] ('y')
@@ -6,15 +5,7 @@ close all
 % Unclassified cones are drawn as grey [0.5 0.5 0.5]
 
 
-tevent = 1530901418.035430;     % unix time. Add the time for when you want
-                                % animation to start. Use online converter
-                                % if you know the specific time of day.
-tstop  = 1530901418.035430 + 15; % if you want specfic duation just copy 
-                                % tevent and add the duration. Otherwise
-                                % just enter the time to stop the animation
-pauseTime = 0.5;                % Amount of time between each frame
-windowSize = [-7 7 -4 10];      % The window size in [m].
-csvFilePath = [''];             % Add the path to the csv files here or put
+
                                 % this script in the same folder as the csv
                                 % files. Don't put csv files in the git
                                 % folder since it will clog the repo.
@@ -28,8 +19,16 @@ end
 %%
 % Useful to see the AS state (ready signal, etc.)
 data = importdata('opendlv.proxy.SwitchStateReading-1401.csv');
-t_ssr = -(data.data(1,5) + data.data(1,6)*1e-6) + (data.data(:,5) + data.data(:,6)*1e-6);
+t_ssr = data.data(:,5) + data.data(:,6)*1e-6;
 SwitchStateReading = data.data(:,7);
+
+tevent = t_ssr(2000);     % unix time. Add the time for when you want
+                          % animation to start. Use online converter
+                          % if you know the specific time of day.
+                          
+tstop  = t_ssr(end);      % if you want specfic duation just copy 
+                          % tevent and add the duration. Otherwise
+                          % just enter the time to stop the animation
 
 
 % Cone type
@@ -39,6 +38,9 @@ ObjectId = data.data(:,7);
 ObjectType = data.data(:,8);
 blueCones = ObjectType==1;
 blueId = ObjectId(blueCones);
+
+
+
 
 % Cone direction
 data = importdata('opendlv.logic.perception.ObjectDirection-118.csv');
@@ -56,6 +58,18 @@ t_aim =  (data.data(:,5) + data.data(:,6)*1e-6);
 AimPointAngle = data.data(:,7);
 AimPointDistance = data.data(:,9);
 
+A = importdata('opendlv.logic.perception.GroundSurfaceArea-211.csv');
+t_surface =  (A.data(:,5) + A.data(:,6)*1e-6);
+SurfaceID = A.data(:,7);
+SurfaceX1 = A.data(:,8);
+SurfaceY1 = A.data(:,9);
+SurfaceX2 = A.data(:,10);
+SurfaceY2 = A.data(:,11);
+SurfaceX3 = A.data(:,12);
+SurfaceY3 = A.data(:,13);
+SurfaceX4 = A.data(:,14);
+SurfaceY4 = A.data(:,15);
+localPath = [SurfaceX1, SurfaceX2, SurfaceX4, SurfaceX3, SurfaceY1, SurfaceY2, SurfaceY4, SurfaceY3, SurfaceID];
 
 %% Animation 
 
@@ -69,39 +83,3 @@ ObjectPositionY = ObjectDistance.*sind(ObjectAngle+90);
 
 AimPointAngleInterp = interp1(t_aim,AimPointAngle,t_objt);
 AimPointDistanceInterp = interp1(t_aim,AimPointDistance,t_objt);
-
-figure;
-
-for i = t0:tend
-    if ObjectId(i)==0
-        pause(pauseTime)
-        clf
-        plot(0,0,'^','MarkerSize',10)
-        hold on
-        axis(windowSize)
-        timeStamp = sprintf('Time stamp: %15.6f',t_objt(i));
-        XLim = xlim;
-        YLim = ylim;
-        text(mean(XLim),0.8*YLim(2),timeStamp)
-    end
-    h = plot(ObjectPositionX(i), ObjectPositionY(i),'o');
-    set(h,'MarkerSize',9)
-    set(h,'MarkerEdgeColor',[0.5 0.5 0.5])
-    switch ObjectType(i)
-        case 1
-            set(h,'MarkerFaceColor','b')
-        case 2 
-            set(h,'MarkerFaceColor','y')
-        case 3 
-            set(h,'MarkerFaceColor',[1 0.5 0])
-        case 4
-            set(h,'MarkerFaceColor','r')
-        case 666
-            set(h,'MarkerFaceColor',[0.5, 0.5, 0.5])
-    end
-    
-    plot(AimPointDistanceInterp(i)*[0 cos(AimPointAngleInterp(i)+pi/2)],AimPointDistanceInterp(i)*[0 sin(AimPointAngleInterp(i)+pi/2)],'k-o')
-
-end
-
-
